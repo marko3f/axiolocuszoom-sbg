@@ -9,26 +9,181 @@ HTMLWidgets.widget({
     return {
 
       renderValue: function(x) {
-        var data_sources, layout;
-        var stateUrlMapping = {chr: "chrom", start: "start", end: "end"};
-        if (!Object.keys(initialState).length) {
-          initialState = {chr: x.chr, start: x.start, end: x.end};
+        //var stateUrlMapping = {chr: "chrom", start: "start", end: "end"};
+        //var initialState = {chr: x.chr, start: x.start, end: x.end};
+
+        /*var data_sources = new LocusZoom.DataSources()
+            .add("assoc", ["AssociationLZ", {url: x.assoc_url, params: {analysis: x.assoc_analysis, id_field: x.assoc_id_field}}])
+            .add("gene", ["GeneLZ", { url: x.gene_url, params: {source: x.gene_source} }])
+            .add("constraint", ["GeneConstraintLZ", { url: "https://gnomad.broadinstitute.org/api/", params: { build: 'GRCh37' } }]);*/
+        
+        
+        
+        var lz_id = x.lz_id;    // options: 'platform_user_data', 'platform_example_data', 'local_user_data', 'local_example_data'
+        
+        var online = x.assoc_url;
+        
+        
+        // UM Database Data
+        if (x.lz_id == 'UM_database_data') {
+          var apiBase_UM_database_data, data_sources_UM_database_data;
+          
+          apiBase_UM_database_data = "https://portaldev.sph.umich.edu/api/v1/";
+          
+          data_sources_UM_database_data = new LocusZoom.DataSources()
+              .add("assoc", ["AssociationLZ", {url: apiBase_UM_database_data + "statistic/single/", params: { source: x.assoc_analysis, id_field: "variant" }}])
+              .add("ld", ["LDServer", { url: "https://portaldev.sph.umich.edu/ld/", params: { source: '1000G', build: 'GRCh37', population: 'ALL' } }])
+              .add("gene", ["GeneLZ", { url: apiBase_UM_database_data + "annotation/genes/", params: { build: 'GRCh37' } }])
+              .add("recomb", ["RecombLZ", { url: apiBase_UM_database_data + "annotation/recomb/results/", params: { build: 'GRCh37' } }])
+              .add("constraint", ["GeneConstraintLZ", { url: "https://gnomad.broadinstitute.org/api/", params: { build: 'GRCh37' } }]);
+          
+        }
+        
+        
+        
+        
+        // Platform User Data
+        if (x.lz_id == 'platform_user_data') {
+          var apiBase_platform_user_data, data_sources_platform_user_data, apiBase_assoc_platform_user_data;
+        
+          apiBase_platform_user_data = "https://portaldev.sph.umich.edu/api/v1/";
+          apiBase_assoc_platform_user_data = window.location.origin + window.location.pathname.substr(0, window.location.pathname.lastIndexOf("/") + 1) + "staticdata/" + x.sub_dir + "/";
+          data_sources_platform_user_data = new LocusZoom.DataSources()
+                .add("assoc", ["AssociationLZ", {url: apiBase_assoc_platform_user_data + x.param_assoc + "?", params: { source: 974, id_field: x.assoc_id_field }}]);
+                //.add("ld", ["LDServer", { url: "https://portaldev.sph.umich.edu/ld/", params: { source: '1000G', build: 'GRCh37', population: 'ALL' } }])
+                //.add("gene", ["GeneLZ", { url: apiBase + "annotation/genes/", params: { build: 'GRCh37' } }])
+                //.add("recomb", ["RecombLZ", { url: apiBase + "annotation/recomb/results/", params: { build: 'GRCh37' } }])
+                //.add("constraint", ["GeneConstraintLZ", { url: "https://gnomad.broadinstitute.org/api/", params: { build: 'GRCh37' } }])
+          if (x.ld_platform_user_data_source_flag == 'UM Database') {
+              data_sources_platform_user_data.add("ld", ["LDServer", { url: "https://portaldev.sph.umich.edu/ld/", params: { source: '1000G', build: x.genome_build, population: 'ALL' } }]);
+          } else {
+              data_sources_platform_user_data.add("ld", ["LDServer", { url: apiBase_assoc_platform_user_data + x.param_ld + "?" }]);
+          }
+          // Define data source for Gene Annotations layer
+          if (x.genes_platform_user_data_source_flag == 'UM Database') {
+              data_sources_platform_user_data.add("gene", ["GeneLZ", { url: 'https://portaldev.sph.umich.edu/api/v1/' + "annotation/genes/", params: { build: x.genome_build } }]);
+          } else {
+              data_sources_platform_user_data.add("gene", ["GeneLZ", { url: apiBase_assoc_platform_user_data + x.param_genes + "?", params: { build: x.genome_build } }]);
+          }
+          // Define data source for Recombination Rates layer
+          if (x.recomb_platform_user_data_source_flag == 'UM Database') {
+              data_sources_platform_user_data.add("recomb", ["RecombLZ", { url: "https://portaldev.sph.umich.edu/api/v1/" + "annotation/recomb/results/", params: { build: x.genome_build } }]);
+          } else {
+              data_sources_platform_user_data.add("recomb", ["RecombLZ", { url: apiBase_assoc_platform_user_data + x.param_recomb + "?", params: { build: x.genome_build } }]);
+          }
+          // Define data source for Constraints layer
+          if (x.constraint_platform_user_data_source_flag == 'UM Database') {
+              data_sources_platform_user_data.add("constraint", ["GeneConstraintLZ", { url: "https://gnomad.broadinstitute.org/api/", params: { build: x.genome_build } }]);
+          } else {
+              data_sources_platform_user_data.add("constraint", ["GeneConstraintLZ", {  url: apiBase_assoc_platform_user_data + x.param_constraint + "?", params: { build: x.genome_build } }]);
+          }
         }
 
-        data_sources = new LocusZoom.DataSources()
-          .add("trait1", ["AssociationLZ", {url: x.assoc_url, params: {analysis: x.assoc_analysis, id_field: x.assoc_id_field}}]),
-          // source 2 = v19 of GRCh37 (hg19?)
-          .add("trait2", ["GeneLZ", { url: x.gene_url, params: {source: x.gene_source} }]);
+        // Local User Data
+        
+        if (x.lz_id == 'local_user_data') {
+          var apiBase_local_user_data, data_sources_local_user_data, apiBase_assoc_local_user_data;
+        
+          apiBase_local_user_data = "https://portaldev.sph.umich.edu/api/v1/";
+          apiBase_assoc_local_user_data = window.location.origin + window.location.pathname.substr(0, window.location.pathname.lastIndexOf("/") + 1) + "staticdata/" + x.sub_dir + "/";
+          data_sources_local_user_data = new LocusZoom.DataSources()
+                .add("assoc", ["AssociationLZ", {url: apiBase_assoc_local_user_data + x.param_assoc + "?", params: { source: 974, id_field: x.assoc_id_field }}]);
+                //.add("ld", ["LDServer", { url: "https://portaldev.sph.umich.edu/ld/", params: { source: '1000G', build: 'GRCh37', population: 'ALL' } }])
+                //.add("gene", ["GeneLZ", { url: apiBase + "annotation/genes/", params: { build: 'GRCh37' } }])
+                //.add("recomb", ["RecombLZ", { url: apiBase + "annotation/recomb/results/", params: { build: 'GRCh37' } }])
+                //.add("constraint", ["GeneConstraintLZ", { url: "https://gnomad.broadinstitute.org/api/", params: { build: 'GRCh37' } }])
+          if (x.ld_local_user_data_source_flag == 'UM Database') {
+              data_sources_local_user_data.add("ld", ["LDServer", { url: "https://portaldev.sph.umich.edu/ld/", params: { source: '1000G', build: x.genome_build, population: 'ALL' } }]);
+          } else {
+              data_sources_local_user_data.add("ld", ["LDServer", { url: apiBase_assoc_local_user_data + x.param_ld + "?" }]);
+          }
+          // Define data source for Gene Annotations layer
+          if (x.genes_local_user_data_source_flag == 'UM Database') {
+              data_sources_local_user_data.add("gene", ["GeneLZ", { url: 'https://portaldev.sph.umich.edu/api/v1/' + "annotation/genes/", params: { build: x.genome_build } }]);
+          } else {
+              data_sources_local_user_data.add("gene", ["GeneLZ", { url: apiBase_assoc_local_user_data + x.param_genes + "?", params: { build: x.genome_build } }]);
+          }
+          // Define data source for Recombination Rates layer
+          if (x.recomb_local_user_data_source_flag == 'UM Database') {
+              data_sources_local_user_data.add("recomb", ["RecombLZ", { url: "https://portaldev.sph.umich.edu/api/v1/" + "annotation/recomb/results/", params: { build: x.genome_build } }]);
+          } else {
+              data_sources_local_user_data.add("recomb", ["RecombLZ", { url: apiBase_assoc_local_user_data + x.param_recomb + "?", params: { build: x.genome_build } }]);
+          }
+          // Define data source for Constraints layer
+          if (x.constraint_local_user_data_source_flag == 'UM Database') {
+              data_sources_local_user_data.add("constraint", ["GeneConstraintLZ", { url: "https://gnomad.broadinstitute.org/api/", params: { build: x.genome_build } }]);
+          } else {
+              data_sources_local_user_data.add("constraint", ["GeneConstraintLZ", {  url: apiBase_assoc_local_user_data + x.param_constraint + "?", params: { build: x.genome_build } }]);
+          }
+        }
+        
+        
 
-        layout = {"state":initialState,"width":1088,"height":612,"responsive_resize":true,"min_region_scale":20000,"max_region_scale":1000000,"dashboard":{"components":[{"type":"title","title":"LocusZoom","subtitle":"Teva data test","position":"left","color":"gray"}]},"panels":[{"proportional_height":0.5,"id":"association","width":1088,"height":306,"min_width":400,"min_height":200,"proportional_width":1,"margin":{"top":35,"right":50,"bottom":40,"left":50},"inner_border":"rgb(210, 210, 210)","dashboard":{"components":[]},"axes":{"x":{"label":"Chromosome {{chr}} (Mb)","label_offset":32,"tick_format":"region","extent":"state","render":true,"label_function":null},"y":{"label":"-log10 p-value","label_offset":28,"render":true,"label_function":null}},"legend":{"orientation":"vertical","origin":{"x":55,"y":40},"hidden":true,"width":115.08906555175781,"height":215.6685791015625,"padding":5,"label_size":12},"interaction":{"drag_background_to_pan":true,"drag_x_ticks_to_scale":true,"drag_y1_ticks_to_scale":true,"drag_y2_ticks_to_scale":true,"scroll_to_zoom":true,"x_linked":true,"y_linked":false},"data_layers":[{"id":"significance","type":"orthogonal_line","orientation":"horizontal","offset":4.522,"style":{"stroke":"#D3D3D3","stroke-width":"3px","stroke-dasharray":"10px 10px"},"x_axis":{"axis":1,"decoupled":true},"y_axis":{"axis":1,"decoupled":true},"fields":[],"z_index":0},{"namespace":{"assoc":"trait1"},"id":"associationpvalues","type":"scatter","point_shape":{"scale_function":"if","field":"ld:isrefvar","parameters":{"field_value":1,"then":"diamond","else":"circle"}},"point_size":{"scale_function":"if","parameters":{"field_value":1,"then":80,"else":40}},"color":"#357ebd","fields":["trait1:variant","trait1:position","trait1:log_pvalue","trait1:log_pvalue|logtoscinotation","trait1:ref_allele"],"id_field":"trait1:variant","z_index":2,"x_axis":{"field":"trait1:position","axis":1},"y_axis":{"axis":1,"field":"trait1:log_pvalue","floor":0,"upper_buffer":0.1,"min_extent":[0,10]},"behaviors":{"onmouseover":[{"action":"set","status":"highlighted"}],"onmouseout":[{"action":"unset","status":"highlighted"}],"onclick":[{"action":"toggle","status":"selected","exclusive":true}],"onshiftclick":[{"action":"toggle","status":"selected"}]},"tooltip":{"namespace":{"assoc":"trait1"},"closable":true,"show":{"or":["highlighted","selected"]},"hide":{"and":["unhighlighted","unselected"]},"html":"{{trait1:variant}}<br>P Value: {{trait1:log_pvalue|logtoscinotation}}<br>Ref. Allele: {{trait1:ref_allele}}"},"tooltip_positioning":"horizontal","fill_opacity":1}],"title":{"text":"","style":{},"x":10,"y":22},"y_index":0,"origin":{"x":0,"y":0},"proportional_origin":{"x":0,"y":0},"background_click":"clear_selections","cliparea":{"height":231,"width":988,"origin":{"x":50,"y":35}}},{"proportional_height":0.5,"id":"genes","width":1427,"height":402,"min_width":400,"min_height":112.5,"proportional_width":1,"margin":{"top":20,"right":50,"bottom":20,"left":50},"axes":{"x":{"render":false},"y1":{"render":false},"y2":{"render":false}},"interaction":{"drag_background_to_pan":true,"scroll_to_zoom":true,"x_linked":true,"drag_x_ticks_to_scale":false,"drag_y1_ticks_to_scale":false,"drag_y2_ticks_to_scale":false,"y1_linked":false,"y2_linked":false},"dashboard":{"components":[{"type":"remove_panel","position":"right","color":"red","group_position":"end"},{"type":"move_panel_up","position":"right","group_position":"middle","color":"gray"},{"type":"move_panel_down","position":"right","group_position":"start","style":{"margin-left":"0.75em"},"color":"gray"},{"type":"resize_to_data","position":"right","color":"gray"}]},"data_layers":[{"namespace":{"gene":"trait2","gene":"transcripts"},"id":"genes","type":"genes","fields":["trait2:all"],"id_field":"gene_id","behaviors":{"onmouseover":[{"action":"set","status":"highlighted"}],"onmouseout":[{"action":"unset","status":"highlighted"}],"onclick":[{"action":"toggle","status":"selected","exclusive":true}],"onshiftclick":[{"action":"toggle","status":"selected"}]},"tooltip":{"closable":true,"show":{"or":["highlighted","selected"]},"hide":{"and":["unhighlighted","unselected"]},"html":"{{gene_name}} Gene ID: {{gene_id}} pLI = {{pLI}} More data on ExAC"},"stroke":"rgb(54, 54, 150)","color":"#363696","label_font_size":12,"label_exon_spacing":4,"exon_height":16,"bounding_box_padding":6,"track_vertical_spacing":10,"x_axis":{"axis":1},"y_axis":{"axis":1},"z_index":0}],"title":{"text":"","style":{},"x":10,"y":22},"y_index":1,"origin":{"x":0,"y":402},"proportional_origin":{"x":0,"y":0.5},"background_click":"clear_selections","cliparea":{"height":362,"width":1327,"origin":{"x":50,"y":20}},"legend":null}],"min_width":400,"min_height":400,"aspect_ratio":1.7777777777777777,"panel_boundaries":true,"mouse_guide":true};
-        layout.dashboard = LocusZoom.Layouts.get("dashboard", "region_nav_plot");
+        // Platform / Local Example Data
+        if (x.lz_id == 'example_data') {
+          var apiBase_example_data, data_sources_example_data;
+          apiBase_example_data = window.location.origin + window.location.pathname.substr(0, window.location.pathname.lastIndexOf("/") + 1) + "staticdata/";
+          data_sources_example_data = new LocusZoom.DataSources()
+                  .add("assoc", ["AssociationLZ", {url: apiBase_example_data + x.param_assoc + "?", params: { source: 45, id_field: x.assoc_id_field }}])
+                  .add("ld", ["LDServer", { url: apiBase_example_data + x.param_ld + "?" }])
+                  .add("gene", ["GeneLZ", { url: apiBase_example_data + x.param_genes + "?", params: { build: 'GRCh37' } }])
+                  .add("recomb", ["RecombLZ", { url: apiBase_example_data + x.param_recomb + "?", params: { build: 'GRCh37' } }])
+                  .add("constraint", ["GeneConstraintLZ", {  url: apiBase_example_data + x.param_constraint + "?", params: { build: 'GRCh37' } }]);
+        }
+
+
+        // Get the standard association plot layout from LocusZoom's built-in layouts
+        var stateUrlMapping = {chr: "chrom", start: "start", end: "end"};
+        // Fetch initial position from the URL, or use some defaults
+        //var initialState = LzDynamicUrls.paramsFromUrl(stateUrlMapping);
+        if(online == 1) {
+          var initialState = {chr: x.chr_value, start: x.min_position, end: x.max_position}; 
+        } else {
+          var initialState = {chr: x.chr_value, start: x.min_position, end: x.max_position};
+        }
+
+
+        var layout = LocusZoom.Layouts.get("plot", "standard_association", {state: initialState, namespace: { assoc: 'assoc' }, min_region_scale: 100000, max_region_scale: 1000000});
+
+        /*LocusZoom.Layouts.add('plot', 'standard_association', {
+            state: {},
+            width: 800,
+            height: 450,
+            responsive_resize: 'width_only',
+            min_region_scale: 20000,
+            max_region_scale: 1000000,
+            dashboard: LocusZoom.Layouts.get('dashboard', 'standard_plot', { unnamespaced: true }),
+            panels: [
+                LocusZoom.Layouts.get('panel', 'association', { namespace: { assoc: 'assoc' }, proportional_height: 0.5 }),
+                LocusZoom.Layouts.get('panel', 'genes', { namespace: { genes: 'gene' }, proportional_height: 0.5 })
+            ]
+        });*/
+
+        //layout.dashboard = LocusZoom.Layouts.get("dashboard", "region_nav_plot");
+        var plot;
         
-        var plot = LocusZoom.populate(el, data_sources, layout);
+        switch(lz_id) {
+          case 'platform_user_data':
+            // code block
+            plot = LocusZoom.populate(el, data_sources_platform_user_data, layout);
+            break;
+          case 'local_user_data':
+            plot = LocusZoom.populate(el, data_sources_local_user_data, layout);
+            break;
+          case 'example_data':
+            plot = LocusZoom.populate(el, data_sources_example_data, layout);
+            break;
+          case 'UM_database_data':
+            plot = LocusZoom.populate(el, data_sources_UM_database_data, layout);
+            break;
+        }
         
+        //plot = LocusZoom.populate(el, data_sources_platform_user_data, layout);
+
         plot.layout.panels.forEach(function(panel){
             plot.panels[panel.id].addBasicLoader();
         });
-        
+
         window.plot;
 
       },
