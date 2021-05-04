@@ -1,8 +1,11 @@
 <img align="right" src="https://github.com/jjsayleraxio/AxioShiny/blob/master/images/axio-logo.png">
 <br><br>
 
-# AxioLocusZoom
-R ShinyApp HTMLWidget using the locuszoom.js library 
+# AxioLocusZoom + SBG Modifications
+R ShinyApp HTMLWidget using the locuszoom.js library.  
+This version is an upgrade to the original AxioLocusZoom package (https://github.com/jjsayleraxio/AxioLocusZoom).
+Compared to the original version of the AxioLocusZoom package, scripts have been updated and adapted to the needs of the LocusZoom Shiny app developed by SevenBridges.
+
 
 ### How To Use
 
@@ -16,7 +19,7 @@ library(devtools)
 ```
 3. Install using `install_github()` command
 ```R
-devtools::install_github("jjsayleraxio/AxioLocusZoom@v0.1.1-alpha")
+devtools::install_github("marko3f/axiolocuszoom-sbg@v0.1.4.1-alpha")
 ```
 
 4. Example of how to run code:
@@ -40,7 +43,6 @@ devtools::install_github("jjsayleraxio/AxioLocusZoom@v0.1.1-alpha")
                        end = [end position]))
   })
 ```
-Change version tag to whatever tagged release you want to use, or leave it off to pull the most current version. Check out the [releases](https://github.com/jjsayleraxio/AxioLocusZoom/releases) for more info.
 
 <hr>
 
