@@ -136,10 +136,15 @@ HTMLWidgets.widget({
         var stateUrlMapping = {chr: "chrom", start: "start", end: "end"};
         // Fetch initial position from the URL, or use some defaults
         //var initialState = LzDynamicUrls.paramsFromUrl(stateUrlMapping);
+        var initialState = {};
         if(online == 1) {
-          var initialState = {chr: x.chr_value, start: x.min_position, end: x.max_position}; 
+            initialState = {chr: x.chr_value, start: x.min_position, end: x.max_position};
         } else {
-          var initialState = {chr: x.chr_value, start: x.min_position, end: x.max_position};
+           if (x.LD_reference == "default") {
+               initialState = {chr: x.chr_value, start: x.min_position, end: x.max_position};  
+          } else {
+               initialState = {chr: x.chr_value, start: x.min_position, end: x.max_position, ldrefvar: x.LD_reference};
+          }
         }
 
 
