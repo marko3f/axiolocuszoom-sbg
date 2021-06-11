@@ -1,8 +1,14 @@
 Package: AxioLocusZoom
 Title: HTMLWidget of the locuszoom.js library
-Version: 0.1.1
-Authors@R: person("Joseph", "Sayler", email = "josephs@axioresearch.com", role = c("aut", "cre"))
-Description: R wrapper (using htmlwidget) of the locuszoom.js library
+Version: 0.1.4.2
+Authors@R: c(
+    person("Marko", "Trifunovic", email = "marko.trifunovic@sbgenomics.com", role = c("aut", "cre")),
+    person("Joseph", "Sayler", email = "josephs@axioresearch.com", role = "aut"))
+Description: R wrapper (using htmlwidget) of the locuszoom.js library. 
+    The package was made for the needs of the LocusZoom Shiny app developed by Seven Bridges. 
+    This version of the package is an upgrade to the original AxioLocusZoom package created by Joseph Sayler.
+    Compared to the original package, this version contains updated JS scripts and all the customizations
+    necessary for the LocusZoom Shiny app.
 Depends: R (>= 3.4.3)
 License: MIT
 Encoding: UTF-8
