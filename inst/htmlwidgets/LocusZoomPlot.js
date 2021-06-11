@@ -148,7 +148,7 @@ HTMLWidgets.widget({
         }
 
 
-        var layout = LocusZoom.Layouts.get("plot", "standard_association", {state: initialState, namespace: { assoc: 'assoc' }, min_region_scale: 100000, max_region_scale: 1000000});
+        var layout = LocusZoom.Layouts.get("plot", "standard_association", {state: initialState, namespace: { assoc: 'assoc' }, min_region_scale: 1000, max_region_scale: 1000000});
 
         /*LocusZoom.Layouts.add('plot', 'standard_association', {
             state: {},
