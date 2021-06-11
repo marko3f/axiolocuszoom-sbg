@@ -1,6 +1,6 @@
 Package: AxioLocusZoom
 Title: HTMLWidget of the locuszoom.js library
-Version: 0.1.4.3
+Version: 0.1.4.4
 Authors@R: c(
     person("Marko", "Trifunovic", email = "marko.trifunovic@sbgenomics.com", role = c("aut", "cre")),
     person("Joseph", "Sayler", email = "josephs@axioresearch.com", role = "aut"))
