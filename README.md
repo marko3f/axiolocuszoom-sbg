@@ -19,7 +19,7 @@ library(devtools)
 ```
 3. Install using `install_github()` command
 ```R
-devtools::install_github("marko3f/axiolocuszoom-sbg@v0.1.4.6-alpha", auth_token = <github_personal_access_token>)
+devtools::install_github("marko3f/axiolocuszoom-sbg@v0.1.4.7-alpha", auth_token = <github_personal_access_token>)
 ```
 
 4. Example of how to run code:
